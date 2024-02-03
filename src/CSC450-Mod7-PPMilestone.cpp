@@ -13,15 +13,22 @@
 
 using namespace std;
 
+int globalCount = 0;
+
 //Create mutex for sync
 mutex mtx;
 
 void countUp() {
 	for (int i = 1; i<=20; ++i){
+
 		// add mutex lock
 		lock_guard <mutex> lock(mtx);
 		cout << "Count up to 20: " << i << endl;
+		globalCount++;
 	}
+
+	// Simulate work of other processes
+	this_thread::sleep_for(chrono::milliseconds(150));
 }
 
 void countDown(){
@@ -29,7 +36,11 @@ void countDown(){
 		//add mutex lock
 		lock_guard<mutex> lock(mtx);
 		cout << "Count down from 20: " << i << endl;
+		globalCount--;
 	}
+	// Simulate work of other processes
+	this_thread::sleep_for(chrono::milliseconds(200));
+
 }
 
 int main() {
@@ -41,6 +52,8 @@ int main() {
 	// Join the threads to sync
 	t1.join();
 	t2.join();
+
+	cout << "Final count: " << globalCount << endl;
 
 	return 0;
 }
